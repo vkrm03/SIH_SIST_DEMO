@@ -1,0 +1,55 @@
+chat.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DoJ Chat Assistant</title>
+  <link rel="stylesheet" href="chat.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <header class="chat-header">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/1200px-Emblem_of_India.svg.png" alt="DoJ" />
+      <h2>DoJ Chat Assistant</h2>
+    </header>
+
+    <div class="chat-box" id="chat-box">
+      <div class="bot-message">
+        👋 Hello! I'm your virtual assistant. How can I help you today?
+      </div>
+    </div>
+
+    <form class="chat-input" onsubmit="sendMessage(event)">
+      <input type="text" id="userInput" placeholder="Type your message..." required />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script>
+    function sendMessage(event) {
+      event.preventDefault();
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if (message === "") return;
+
+      const chatBox = document.getElementById("chat-box");
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "user-message";
+      userMsg.innerText = "🧑 " + message;
+      chatBox.appendChild(userMsg);
+
+      const botMsg = document.createElement("div");
+      botMsg.className = "bot-message";
+      botMsg.innerText = "🤖 This is a placeholder reply.";
+      setTimeout(() => {
+        chatBox.appendChild(botMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 600);
+
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
