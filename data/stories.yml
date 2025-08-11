@@ -1,0 +1,21 @@
+version: "3.1"
+stories:
+- story: greet path
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- story: goodbye path
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: judge query
+  steps:
+  - intent: ask_judges_count
+  - action: utter_ask_judges_count
+
+- story: case status query
+  steps:
+  - intent: ask_case_status
+  - action: action_check_case_status

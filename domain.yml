@@ -1,0 +1,41 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - ask_judges_count
+  - ask_case_status
+
+responses:
+  utter_greet:
+    - text: "Hey! How can I assist you today?"
+
+  utter_goodbye:
+    - text: "Goodbye! Have a great day."
+
+  utter_ask_judges_count:
+    - text: "There are currently 34 judges in the Supreme Court of India."
+
+  utter_ask_case_status:
+    - text: "Please provide a valid case number for me to check the status."
+
+  utter_happy:
+    - text: "That's wonderful to hear!"
+
+  utter_sad:
+    - text: "I'm sorry to hear that. How can I help?"
+
+  utter_iamabot:
+    - text: "I am a Rasa-powered virtual assistant."
+
+actions:
+  - action_check_case_status
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

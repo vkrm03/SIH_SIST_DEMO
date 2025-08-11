@@ -1,0 +1,21 @@
+version: "3.1"
+rules:
+- rule: Greet rule
+  steps:
+    - intent: greet
+    - action: utter_greet
+
+- rule: Goodbye rule
+  steps:
+    - intent: goodbye
+    - action: utter_goodbye
+
+- rule: Judges count rule
+  steps:
+    - intent: ask_judges_count
+    - action: utter_ask_judges_count
+
+- rule: Case status rule
+  steps:
+    - intent: ask_case_status
+    - action: action_check_case_status

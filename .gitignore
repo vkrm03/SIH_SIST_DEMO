@@ -1,0 +1,29 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Rasa model files
+models/
+
+# Rasa cache
+.rasa/
+.rasa/cache/
+
+# Logs
+*.log
+
+# Environment variables / secrets
+.env
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# VS Code settings
+.vscode/
