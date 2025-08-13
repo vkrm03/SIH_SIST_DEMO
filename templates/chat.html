@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DoJ Chat Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}" />
+
+  <!-- Font Awesome for mic icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <header class="chat-header">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/1200px-Emblem_of_India.svg.png" alt="DoJ" />
+      <h2>DoJ Chat Assistant</h2>
+    </header>
+
+    <div class="chat-box" id="chat-box">
+      <div class="bot-message">
+        Hello! I'm your virtual assistant. How can I help you today?
+      </div>
+    </div>
+
+    <form class="chat-input" onsubmit="sendMessage(event)">
+      <input type="text" id="userInput" placeholder="Type your message..." required />
+      <button type="button" id="voiceBtn" title="Speak">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+<script>
+    async function loadHistory() {
+      const res = await fetch("/history");
+      const history = await res.json();
+      const chatBox = document.getElementById("chat-box");
+
+      chatBox.innerHTML = "";
+
+      history.forEach(msg => {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = msg.role === "user" ? "user-message" : "bot-message";
+        msgDiv.innerText = msg.content;
+        chatBox.appendChild(msgDiv);
+      });
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage(event) {
+      if (event) event.preventDefault();
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if (message === "") return;
+
+      const chatBox = document.getElementById("chat-box");
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "user-message";
+      userMsg.innerText = message;
+      chatBox.appendChild(userMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      input.value = "";
+
+      const botMsg = document.createElement("div");
+      botMsg.className = "bot-message";
+      botMsg.innerText = "Typing...";
+      chatBox.appendChild(botMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+
+        botMsg.innerText = data.reply;
+      } catch (err) {
+        botMsg.innerText = "Error connecting to server.";
+      }
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // --- VOICE RECOGNITION FEATURE ---
+    const voiceBtn = document.getElementById("voiceBtn");
+    const userInput = document.getElementById("userInput");
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-IN";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      voiceBtn.addEventListener("click", () => {
+        recognition.start();
+        voiceBtn.innerHTML = '<i class="fa-solid fa-microphone-lines"></i>'; // listening icon
+        userInput.value = "Listening..."; // show listening status in input
+      });
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        userInput.value = transcript;
+        sendMessage(); // auto-send after speaking
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        userInput.value = ""; // clear if error
+      };
+
+      recognition.onend = () => {
+        voiceBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>'; // back to normal
+        if (userInput.value === "Listening...") {
+          userInput.value = ""; // clear if no speech
+        }
+      };
+    } else {
+      voiceBtn.disabled = true;
+      voiceBtn.title = "Speech recognition not supported in this browser.";
+    }
+
+    // Load chat history
+    loadHistory();
+</script>
+
+</body>
+</html>

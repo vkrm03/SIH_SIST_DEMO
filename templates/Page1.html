@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <title>DoJ AI Chat Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="header">
+    <div class="logo-container">
+<!--      https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/1200px-Emblem_of_India.svg.png-->
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/1200px-Emblem_of_India.svg.png" alt="Government Emblem" class="logo">
+      <div class="header-text">
+        <h1>Department of Justice</h1>
+        <p>Ministry of Law & Justice, Government of India</p>
+      </div>
+    </div>
+    <div class="header-left">
+      <img src="https://cdnbbsr.s3waas.gov.in/s35d6646aad9bcc0be55b2c82f69750387/uploads/2022/11/2022112837.png">
+      <img src="https://cdnbbsr.s3waas.gov.in/s35d6646aad9bcc0be55b2c82f69750387/uploads/2021/08/2021081941.png">
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h2>An AI-Powered Virtual Assistant for Justice</h2>
+      <p>Get instant, reliable answers about courts, judges, procedures, and legal services in India.</p>
+      <a href="{{ url_for('chat') }}" class="cta-btn">Start Chat</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <h2>What You Can Do</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Case Status & Court Data</h3>
+        <p>Check real-time pendency, case updates, and judge appointments at all court levels.</p>
+      </div>
+      <div class="feature-card">
+        <h3>eCourts & ePay Guidance</h3>
+        <p>Step-by-step help for eFiling, paying fines, and using online legal services.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Fast Track Court Info</h3>
+        <p>Know how Fast Track Special Courts work and their role in sensitive case trials.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Legal Aid & Tele Law</h3>
+        <p>Learn how to get free legal advice and connect with legal experts online.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="innovation">
+    <h2>Innovative Features</h2>
+    <ul>
+      <li>Real-time NJDG court data integration</li>
+      <li>AI-assisted legal procedure guidance</li>
+      <li>Multilingual support for accessibility</li>
+      <li>Interactive FAQ with instant search</li>
+    </ul>
+  </section>
+
+  <!-- Floating Chatbot Button -->
+<div id="chatbot-float-btn" class="chatbot-float-btn">
+  <i class="fa-solid fa-paper-plane"></i>
+</div>
+
+<!-- Chatbot Box -->
+<div id="chatbot-box" class="chatbot-box hidden">
+  <div class="chatbot-header">
+    <h4>Need Help?</h4>
+    <span id="close-chatbot">&times;</span>
+  </div>
+  <div class="chatbot-body" id="chatbot-messages">
+    <div class="msg bot">Hey! I’m Jus, your virtual stay assistant How can I help you today?</div>
+  </div>
+  <div class="chatbot-footer">
+    <input type="text" id="chatbot-input" placeholder="Type your message..." />
+    <button id="send-btn">Send</button>
+  </div>
+</div>
+
+
+  <script>
+  const chatbotBtn = document.getElementById('chatbot-float-btn');
+  const chatbotBox = document.getElementById('chatbot-box');
+  const closeBtn = document.getElementById('close-chatbot');
+  const messagesDiv = document.getElementById('chatbot-messages');
+  const inputField = document.getElementById('chatbot-input');
+  const sendBtn = document.getElementById('send-btn');
+
+  // Show chat history when opened
+  chatbotBtn.addEventListener('click', async () => {
+    chatbotBox.classList.toggle('hidden');
+    if (!chatbotBox.classList.contains('hidden')) {
+      await loadHistory();
+    }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    chatbotBox.classList.add('hidden');
+  });
+
+  function addMessage(sender, text) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('msg', sender);
+    msgDiv.textContent = text;
+    messagesDiv.appendChild(msgDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch("/history");
+      const history = await res.json();
+      messagesDiv.innerHTML = "";
+      history.forEach(msg => {
+        addMessage(msg.role === "user" ? "user" : "bot", msg.content);
+      });
+    } catch (err) {
+      console.error("Error loading history:", err);
+    }
+  }
+
+  async function sendMessage() {
+    const text = inputField.value.trim();
+    if (!text) return;
+    addMessage('user', text);
+    inputField.value = '';
+
+    // Typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.classList.add('msg', 'bot');
+    typingDiv.textContent = "Typing...";
+    messagesDiv.appendChild(typingDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+      const res = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await res.json();
+      typingDiv.textContent = data.reply;
+    } catch (err) {
+      typingDiv.textContent = "Error connecting to server.";
+      console.error(err);
+    }
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  inputField.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+</script>
+
+
+
+
+  <footer class="footer">
+    <p>© 2025 Department of Justice | Ministry of Law & Justice, Government of India</p>
+  </footer>
+</body>
+</html>

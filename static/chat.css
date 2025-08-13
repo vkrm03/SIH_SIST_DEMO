@@ -16,8 +16,8 @@ body {
 }
 
 .chat-container {
-  width: 90%;
-  max-width: 500px;
+  width: 100%;
+  max-width: 800px;
   background-color: #ffffff;
   border-radius: 12px;
   overflow: hidden;
@@ -95,7 +95,7 @@ body {
 
 .chat-input button {
   padding: 0 20px;
-  background-color: #f9a825;
+  background-color: #1565C0;
   border: none;
   color: black;
   font-weight: bold;
